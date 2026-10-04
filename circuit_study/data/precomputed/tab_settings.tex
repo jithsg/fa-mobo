@@ -1,0 +1,30 @@
+\begin{table}[pos=htbp]
+\centering
+\caption{Settings of FA-MOBO as run in all experiments (values read from the implementation). The baseline configurations use the same Phase III settings; qNEHVI and Aug-BO omit the classifier ($w=0$), and qNEHVI+m adds a 0.3\,dB margin to the $OP_{1dB}$ constraint.}
+\label{tab:settings}
+\footnotesize
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.0cm}>{\raggedright\arraybackslash}p{12.8cm}@{}}
+\toprule
+Item & Setting \\
+\midrule
+\multicolumn{2}{@{}l}{\textit{Surrogate models (Phase III)}} \\
+Model & one exact GP per outcome (2 objectives, 6 constraints), SingleTaskGP \\
+Kernel and priors & RBF, ARD (10 lengthscales); LogNormalPrior lengthscale prior, LogNormalPrior noise prior (BoTorch defaults) \\
+Inputs / outputs & unit cube, 4 continuous variables + 3-D $(L,Q,\mathrm{SRF})$ embedding per inductor (10 dimensions); outputs standardized \\
+Fitting & marginal likelihood maximization, refitted after every batch \\
+\multicolumn{2}{@{}l}{\textit{Acquisition (Phase III)}} \\
+Criterion & qLogNEHVI, reference point inferred from the observed feasible Pareto front, constraint smoothing $\eta=0.001$ \\
+Monte Carlo & 64 Sobol quasi-Monte Carlo samples \\
+Batch and optimizer & $q=3$, sequential greedy; L-BFGS-B, 3 restarts from 128 raw samples, at most 100 iterations \\
+Feasibility classifier & random forest, 300 trees, minimum leaf 2, balanced-subsample class weights; weight $w=1$, $\epsilon=0.001$; refitted before every batch on all simulated designs with valid metrics (the GP training set) \\
+Discrete inductors & snap to nearest library entry with SRF $\geq 3f_0$; distance weights $L$ 1, $Q$ 0.25, SRF 0.1 \\
+\multicolumn{2}{@{}l}{\textit{Feasibility augmentation (Phase II, Algorithm~\ref{alg:augmentation})}} \\
+Labels & near-feasible: all six constraints with $OP_{1dB}$ relaxed by 1\,dB \\
+Ensembles & sizes 5, 10, 15 random forests, 600 trees each, minimum leaf 2, each forest on its own bootstrap resample of the seed \\
+Candidates and score & 20,000 Latin-hypercube candidates within the observed seed bounds; risk weight $\lambda=0.5$; efficiency weight exponent 1 \\
+Selection & $N_{\mathrm{over}}=25$ per ensemble, diversity cap $\kappa=18$ per inductor, top $N_{\mathrm{select}}=15$ simulated \\
+\multicolumn{2}{@{}l}{\textit{Software}} \\
+Libraries & BoTorch 0.12.0, GPyTorch 1.13, scikit-learn 1.7.2, PyTorch 2.13.0 \\
+\bottomrule
+\end{tabular}
+\end{table}

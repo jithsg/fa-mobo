@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+circuit_study/outputs/*
+!circuit_study/outputs/.keep
+benchmarks/results_all/
+benchmarks/out/
+*.aux
+*.log
+*.fls
+*.fdb_latexmk
+.DS_Store

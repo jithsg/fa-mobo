@@ -1,0 +1,130 @@
+{
+ "scored_utc": "2026-09-16T19:23:42+00:00",
+ "pre_registration_written_utc": "2026-09-16T18:02:29+00:00",
+ "outcome": {
+  "C2DTLZ2": {
+   "predicted": -3.3571428571428568,
+   "predicted_sign": "FA-MOBO behind",
+   "measured": 4.5,
+   "wins": 15,
+   "losses": 4,
+   "seeds": 20,
+   "wilcoxon_p": 0.029543026699597623,
+   "verdict": "failed"
+  },
+  "C3DTLZ4": {
+   "predicted": 0.4642857142857143,
+   "predicted_sign": "FA-MOBO ahead",
+   "measured": 3.15,
+   "wins": 13,
+   "losses": 6,
+   "seeds": 20,
+   "wilcoxon_p": 0.07274724306363556,
+   "verdict": "held"
+  }
+ },
+ "predictions_correct": "1/2",
+ "decomposition": {
+  "C2DTLZ2": {
+   "augmentation_rate": 0.635,
+   "bo_rate_fa_mobo": 0.7402173913043478,
+   "bo_rate_control": 0.6410714285714286,
+   "n_augmentation": 10,
+   "n_bo": 46,
+   "direct_term": -0.060714285714286165,
+   "indirect_term": 4.560714285714283,
+   "sum": 4.499999999999997,
+   "measured": 4.5
+  },
+  "C3DTLZ4": {
+   "augmentation_rate": 0.23,
+   "bo_rate_fa_mobo": 0.2510869565217391,
+   "bo_rate_control": 0.19107142857142856,
+   "n_augmentation": 10,
+   "n_bo": 46,
+   "direct_term": 0.3892857142857145,
+   "indirect_term": 2.760714285714286,
+   "sum": 3.150000000000001,
+   "measured": 3.15
+  },
+  "MW11": {
+   "augmentation_rate": 0.2625,
+   "bo_rate_fa_mobo": 0.045714285714285714,
+   "bo_rate_control": 0.027906976744186046,
+   "n_augmentation": 8,
+   "n_bo": 35,
+   "direct_term": 1.8767441860465117,
+   "indirect_term": 0.6232558139534884,
+   "sum": 2.5,
+   "measured": 2.5
+  },
+  "MW2": {
+   "augmentation_rate": 0.10625,
+   "bo_rate_fa_mobo": 0.08285714285714285,
+   "bo_rate_control": 0.09883720930232558,
+   "n_augmentation": 8,
+   "n_bo": 35,
+   "direct_term": 0.059302325581395365,
+   "indirect_term": -0.5593023255813954,
+   "sum": -0.5,
+   "measured": -0.5
+  },
+  "MW3": {
+   "augmentation_rate": 0.25,
+   "bo_rate_fa_mobo": 0.5414285714285715,
+   "bo_rate_control": 0.5104651162790698,
+   "n_augmentation": 8,
+   "n_bo": 35,
+   "direct_term": -2.083720930232558,
+   "indirect_term": 1.08372093023256,
+   "sum": -0.999999999999998,
+   "measured": -1.0
+  },
+  "MW7": {
+   "augmentation_rate": 0.38125,
+   "bo_rate_fa_mobo": 0.21142857142857144,
+   "bo_rate_control": 0.20465116279069767,
+   "n_augmentation": 8,
+   "n_bo": 35,
+   "direct_term": 1.4127906976744184,
+   "indirect_term": 0.23720930232558182,
+   "sum": 1.6500000000000004,
+   "measured": 1.65
+  },
+  "OSY": {
+   "augmentation_rate": 0.0,
+   "bo_rate_fa_mobo": 0.82,
+   "bo_rate_control": 0.8153061224489796,
+   "n_augmentation": 9,
+   "n_bo": 40,
+   "direct_term": -7.337755102040816,
+   "indirect_term": 0.18775510204081414,
+   "sum": -7.150000000000002,
+   "measured": -7.15
+  },
+  "TNK": {
+   "augmentation_rate": 0.13,
+   "bo_rate_fa_mobo": 0.26142857142857145,
+   "bo_rate_control": 0.295,
+   "n_augmentation": 5,
+   "n_bo": 35,
+   "direct_term": -0.825,
+   "indirect_term": -1.1749999999999985,
+   "sum": -1.9999999999999984,
+   "measured": -2.0
+  }
+ },
+ "decomposition_note": "direct + indirect reproduces the measured difference exactly because both arms spend the same post-seed budget on a shared seed phase; it is an accounting identity, not a model",
+ "fit": {
+  "sum_vs_measured_r": 1.0,
+  "direct_only_r": 0.8667113154265546,
+  "indirect_only_r": 0.6284190411009134,
+  "indirect_share_of_magnitude": 0.4433748887914998,
+  "indirect_outweighs_direct_on": [
+   "C2DTLZ2",
+   "C3DTLZ4",
+   "MW2",
+   "TNK"
+  ]
+ }
+}

@@ -1,0 +1,84 @@
+{
+ "written_utc": "2026-09-16T18:02:29+00:00",
+ "status": "written BEFORE any run at seeds 101-120 on these problems",
+ "rule": "predicted difference in feasible designs = augmentation_evaluations * (augmentation conversion rate - control BO conversion rate); a conversion rate is feasible designs found per evaluation spent in that phase",
+ "rule_origin": "derived post hoc from the first six problems, where it tracked the measured paired difference with r = 0.971",
+ "problems": [
+  "C2DTLZ2",
+  "C3DTLZ4"
+ ],
+ "arms": [
+  "FA-MOBO",
+  "Aug-BO",
+  "Clf-BO",
+  "qNEHVI"
+ ],
+ "design_seeds": [
+  101,
+  102,
+  103,
+  104,
+  105,
+  106,
+  107,
+  108,
+  109,
+  110,
+  111,
+  112,
+  113,
+  114,
+  115,
+  116,
+  117,
+  118,
+  119,
+  120
+ ],
+ "pilot_seeds": [
+  198,
+  199
+ ],
+ "predictions": {
+  "C2DTLZ2": {
+   "augmentation_rate": 0.45,
+   "augmentation_trials": 20,
+   "bo_rate_of_control": 0.7857142857142857,
+   "bo_trials": 112,
+   "augmentation_evaluations": 10,
+   "predicted_mean_difference_vs_control": -3.3571428571428568,
+   "predicted_sign": "FA-MOBO behind",
+   "pilot_seeds_used": [
+    198,
+    199
+   ]
+  },
+  "C3DTLZ4": {
+   "augmentation_rate": 0.35,
+   "augmentation_trials": 20,
+   "bo_rate_of_control": 0.30357142857142855,
+   "bo_trials": 112,
+   "augmentation_evaluations": 10,
+   "predicted_mean_difference_vs_control": 0.4642857142857143,
+   "predicted_sign": "FA-MOBO ahead",
+   "pilot_seeds_used": [
+    198,
+    199
+   ]
+  }
+ },
+ "analysis_plan": {
+  "primary_metric": "feasible designs per run",
+  "comparison": "FA-MOBO minus qNEHVI, paired by seed over the 20 design seeds",
+  "test": "two-sided Wilcoxon signed-rank on the non-zero paired differences",
+  "confirmation": "the sign of the measured mean paired difference matches predicted_sign for each problem",
+  "reporting": "both problems are reported whatever the outcome; a failed prediction is reported as a failed prediction"
+ },
+ "code_state": {
+  "bench_problems.py": "332b77e665dc2ade",
+  "bench_arms.py": "c817b1bd56c9353e",
+  "bench_run.py": "d0c77ee53ab6bee3",
+  "bench_report.py": "a2b8bb6b6647eb2f"
+ },
+ "design_runs_present_at_write_time": []
+}

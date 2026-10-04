@@ -1,0 +1,82 @@
+{
+ "MW2": {
+  "random_search_hv": 0.8203846252719669,
+  "target_hv": 0.41019231263598344,
+  "feasible_fraction": 0.00695,
+  "n_samples": 20000,
+  "hv_ref": [
+   1.2,
+   1.2
+  ]
+ },
+ "MW3": {
+  "random_search_hv": 0.8183604431454499,
+  "target_hv": 0.40918022157272493,
+  "feasible_fraction": 0.01275,
+  "n_samples": 20000,
+  "hv_ref": [
+   1.2,
+   1.2
+  ]
+ },
+ "MW7": {
+  "random_search_hv": 1.2182034912151563,
+  "target_hv": 0.6091017456075781,
+  "feasible_fraction": 0.0175,
+  "n_samples": 20000,
+  "hv_ref": [
+   1.5,
+   1.5
+  ]
+ },
+ "MW11": {
+  "random_search_hv": 1.9977866487764762,
+  "target_hv": 0.9988933243882381,
+  "feasible_fraction": 0.02505,
+  "n_samples": 20000,
+  "hv_ref": [
+   2.2,
+   2.2
+  ]
+ },
+ "TNK": {
+  "random_search_hv": 0.6279636086890048,
+  "target_hv": 0.3139818043445024,
+  "feasible_fraction": 0.05135,
+  "n_samples": 20000,
+  "hv_ref": [
+   1.2,
+   1.2
+  ]
+ },
+ "OSY": {
+  "random_search_hv": 79237.94954449746,
+  "target_hv": 39618.97477224873,
+  "feasible_fraction": 0.03465,
+  "n_samples": 20000,
+  "hv_ref": [
+   0.0,
+   386.0
+  ]
+ },
+ "C2DTLZ2": {
+  "random_search_hv": 1.0307583543044303,
+  "target_hv": 0.5153791771522152,
+  "feasible_fraction": 0.01025,
+  "n_samples": 20000,
+  "hv_ref": [
+   1.4,
+   1.4
+  ]
+ },
+ "C3DTLZ4": {
+  "random_search_hv": 3.566768432066998,
+  "target_hv": 1.783384216033499,
+  "feasible_fraction": 0.01085,
+  "n_samples": 20000,
+  "hv_ref": [
+   2.6,
+   2.4
+  ]
+ }
+}

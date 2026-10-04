@@ -1,0 +1,7 @@
+# Tested with Python 3.10.12
+numpy==1.26.4
+pandas==2.3.3
+scipy==1.15.3
+matplotlib==3.10.9
+pillow==12.3.0
+scikit-learn==1.7.2

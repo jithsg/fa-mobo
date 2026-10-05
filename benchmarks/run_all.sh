@@ -11,4 +11,6 @@ echo "== benchmark tables"
 "$PY" bench_tables.py
 echo "== the circuit on the same axis (needs the circuit data of 04_code_and_data)"
 "$PY" make_axis_table.py || echo "   skipped: circuit histories not present"
-echo "Tables written to out/tables"
+echo "== decomposition figure (main-text Fig. 10; needs the circuit data too)"
+"$PY" make_axis_figure.py || echo "   skipped: circuit histories not present"
+echo "Tables written to out/tables, figure to out/fig_axis.pdf"

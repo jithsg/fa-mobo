@@ -1,4 +1,4 @@
-"""Graphical abstract: headline statement with numbers, three-phase strip, yield bars and the reliability curve.
+"""Graphical abstract: headline statement with numbers, three-phase strip, yield bars and a per-run feasible vs new high-margin scatter.
 
 Output: out/gaabstract.pdf / .png (1500 dpi, RGB) / _preview.png. Every number is computed from the run histories.
 Run from the scripts folder: python make_gabstract.py
@@ -14,10 +14,15 @@ import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch  # noqa: E402
 
-from common import BOX_COLORS, BUDGET, FS, JOINT_FEASIBLE, JOINT_NEW_HM, K_MARGIN, N_SEED, save  # noqa: E402
+from matplotlib.lines import Line2D  # noqa: E402
+from matplotlib.patches import Rectangle  # noqa: E402
+
+from common import BOX_COLORS, BUDGET, FS, JOINT_FEASIBLE, JOINT_NEW_HM, K_MARGIN, N_SEED, joint_target_sims, save  # noqa: E402
 
 NOTE = FS["note"]   # smallest text size (7 pt)
-from make_figures import ARMS, MAIN, N_RUNS, PS, W, col, paired_test, per_seed, reach_panel, reach_summary, short  # noqa: E402
+from make_figures import ARMS, MAIN, N_RUNS, PS, W, col, paired_test, per_seed, reach_summary, short  # noqa: E402
+
+MARKERS = {"fa15qc": "o", "qnc": "s", "fa15q": "D", "qnm": "v", "qn": "^"}   # shape as well as colour per arm
 
 
 def headline_numbers(reach: dict) -> dict:
@@ -69,14 +74,41 @@ def yield_bars(ax) -> None:
     ax.set_title(f"Designs per run, mean ± s.d., {N_RUNS} seeds")
 
 
+def run_scatter(ax) -> dict:
+    """One point per run: strictly feasible designs (x) vs new high-margin designs beyond the shared seed (y), joint-target region shaded."""
+    arms = list(ARMS); off = dict(zip(arms, np.linspace(0.16, -0.16, len(arms))))   # small fixed row offset per arm: integer counts never hide each other
+    xmax = float(PS["feasible"].max()) * 1.1; ymax = float((PS["k15"] - PS["k15_lhs"]).max()) + 1.6   # headroom for the region label
+    ax.add_patch(Rectangle((JOINT_FEASIBLE, JOINT_NEW_HM - 0.5), xmax, ymax, facecolor="#EDEDED", edgecolor="none", zorder=0))
+    ax.axvline(JOINT_FEASIBLE, color="0.45", lw=0.6, ls="--", zorder=1); ax.axhline(JOINT_NEW_HM - 0.5, color="0.45", lw=0.6, ls="--", zorder=1)
+    ax.text(xmax * 0.98, ymax - 0.2, f"joint target: ≥ {JOINT_FEASIBLE} feasible and ≥ {JOINT_NEW_HM} new high-margin",
+            ha="right", va="top", fontsize=NOTE, color="0.3")
+    inside, handles = {}, []
+    for a in [x for x in arms if x != MAIN] + [MAIN]:                   # FA-MOBO drawn last (on top)
+        f = per_seed(a, "feasible"); h = per_seed(a, "k15") - per_seed(a, "k15_lhs")
+        inside[short(a)] = int(np.sum((f >= JOINT_FEASIBLE) & (h >= JOINT_NEW_HM)))
+        big = a == MAIN
+        ax.scatter(f, h + off[a], s=22 if big else 13, marker=MARKERS[a], facecolors=col(a) if big else "none", edgecolors=col(a),
+                   linewidths=0.6 if big else 0.8, zorder=6 if big else 4)
+    for a in arms:
+        big = a == MAIN
+        handles.append(Line2D([], [], ls="", marker=MARKERS[a], markersize=4.5 if big else 3.8, mfc=col(a) if big else "none", mec=col(a),
+                              mew=0.8, label=f"{short(a)}  {inside[short(a)]}/{N_RUNS}"))
+    ax.set_xlim(0, xmax); ax.set_ylim(-0.6, ymax); ax.set_yticks(range(int(ymax - 1.6) + 1))
+    ax.set_xlabel("Strictly feasible designs per run"); ax.set_ylabel("New high-margin designs per run\n(beyond the shared seed)")
+    leg = ax.legend(handles=handles, title="runs in target", fontsize=NOTE, title_fontsize=NOTE, loc="center left",
+                    bbox_to_anchor=(1.01, 0.5), handletextpad=0.3, borderpad=0.4, framealpha=0.9)
+    leg.get_texts()[0].set_weight("bold")
+    ax.set_title(f"Every run, {len(arms)} configurations × {N_RUNS} seeds")
+    return inside
+
+
 def main() -> None:
     fig = plt.figure(figsize=(W, 4.6))
     gs = fig.add_gridspec(2, 2, height_ratios=[0.78, 1.5], hspace=0.16, wspace=0.42, width_ratios=[1.0, 1.05])
-    ax_r = fig.add_subplot(gs[1, 1])
-    reach = reach_panel(ax_r, fs=NOTE)
-    ax_r.set_xlabel("Harmonic-balance simulations"); ax_r.set_ylabel("Fraction of runs at\nthe joint target")
-    ax_r.set_title(f"Joint target: ≥ {JOINT_FEASIBLE} feasible and ≥ {JOINT_NEW_HM} new high-margin design")
+    reach = {a: joint_target_sims(a) for a in ARMS}
+    inside = run_scatter(fig.add_subplot(gs[1, 1]))
     n = headline_numbers(reach)
+    assert inside == n["reached"], (inside, n["reached"])   # end-of-budget region count must equal the joint-target count
     ax_s = fig.add_subplot(gs[0, :]); strip(ax_s, n)
     yield_bars(fig.add_subplot(gs[1, 0]))
     r = n["reached"]; p_floor = math.floor(n["hv_p_min"] * 100) / 100

@@ -24,14 +24,15 @@ benchmark table of the article is here:
 - `bench_arms.py`, `bench_run.py` — the four arms and the runner
 - `results/` — all 640 run records (per-evaluation objectives, constraints, phase, feasibility)
 - `bench_report.py`, `bench_tables.py`, `make_axis_table.py` — aggregation and tables
+- `make_axis_figure.py` — the decomposition figure (main-text Fig. 10; its values are Supplementary Table S8)
 - `pre_registration.json`, `pre_registration_outcome.json` — a prediction recorded and
   hash-pinned before two of the problems were run, and its scored outcome
 - `bench_targets.json` — the fixed hypervolume targets
 
       cd benchmarks && pip install -r requirements.txt && bash run_all.sh
 
-`make_axis_table.py` places the circuit study on the same axis as the benchmarks and therefore
-reads `circuit_study/`; run the circuit part first, or it is skipped with a message.
+`make_axis_table.py` and `make_axis_figure.py` place the circuit study on the same axis as the benchmarks and therefore
+read `circuit_study/`; run the circuit part first, or it is skipped with a message.
 
 ## `circuit_study/` — the Class-E power-amplifier study
 

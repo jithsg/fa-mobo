@@ -5,7 +5,7 @@ set -euo pipefail
 cd "$(dirname "$0")/scripts"
 PY=${PYTHON:-python3}
 export MPLBACKEND=Agg
-for s in make_tables.py make_figures.py make_fig_architecture.py make_extra.py make_gabstract.py make_novel.py make_novel_tables.py ea_numbers.py rf_classifier_analysis.py; do
+for s in make_tables.py make_fig_tests.py make_figures.py make_fig_architecture.py make_extra.py make_gabstract.py make_novel.py make_novel_tables.py ea_numbers.py rf_classifier_analysis.py; do
   echo "== $s"
   "$PY" "$s"
 done

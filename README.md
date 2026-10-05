@@ -24,7 +24,7 @@ benchmark table of the article is here:
 - `bench_arms.py`, `bench_run.py` — the four arms and the runner
 - `results/` — all 640 run records (per-evaluation objectives, constraints, phase, feasibility)
 - `bench_report.py`, `bench_tables.py`, `make_axis_table.py` — aggregation and tables
-- `make_axis_figure.py` — the decomposition figure (main-text Fig. 10; its values are Supplementary Table S8)
+- `make_axis_figure.py` — the main-text decomposition figure (its values are Supplementary Table S8)
 - `pre_registration.json`, `pre_registration_outcome.json` — a prediction recorded and
   hash-pinned before two of the problems were run, and its scored outcome
 - `bench_targets.json` — the fixed hypervolume targets

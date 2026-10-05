@@ -74,8 +74,8 @@ def fig_architecture() -> dict:
     ax.set_xlim(0, XMAX); ax.set_ylim(0, YMAX); ax.axis("off")
     fig.subplots_adjust(left=0, right=0.975, bottom=0, top=1)   # saved width ~6.86 in as for the other figures: 7 pt prints at ~6.6 pt
 
-    box(ax, xs[0], widths[0], "Phase I", "PDK-aware seed",
-        f"{N_SEED}-design Latin hypercube\nover {len(DESIGN_VARS)} design variables;\nspiral inductors from an\nEM-characterized PDK library",
+    box(ax, xs[0], widths[0], "Phase I", "Space-filling seed",
+        f"{N_SEED}-design Latin hypercube\nover {len(DESIGN_VARS)} design variables;\ninductors chosen from a\ncharacterized component library",
         f"{n['seed_feasible']:.0f} of {N_SEED} feasible\n{n['seed_high_margin']:.0f} high-margin", BOX_COLORS["seed"])
     box(ax, xs[1], widths[1], "Phase II", "Feasibility-augmented sampling",
         f"Random-forest feasibility\nensembles rank candidates by\nP(feasible) × efficiency weight;\nsimulate the top {n['n_aug']} (Alg. 1)",
@@ -83,12 +83,12 @@ def fig_architecture() -> dict:
     box(ax, xs[2], widths[2], "Phase III", "Classifier-guided constrained MOBO",
         f"qLogNEHVI on GPs of PAE, Psat\nand {N_CONSTRAINTS} constraints; log-acquisition\nplus log P(feasible) of an in-loop\nrandom-forest classifier",
         f"{n['bo_feasible']:.1f} of {n['n_opt']} feasible\n{n['bo_high_margin']:.1f} high-margin", BOX_COLORS["bo"])
-    box(ax, xs[3], widths[3], "Output", "Convergence-informed budget",
+    box(ax, xs[3], widths[3], "Output", "convergence-informed\nevaluation budget",
         f"Pareto set in\n(PAE, Psat) and\nhigh-margin\ndesigns",
         f"{n['feasible']:.1f} feasible\n{n['high_margin']:.1f} high-margin", BOX_COLORS["out"])
 
     y_mid = Y0 + BOX_H * 0.55
-    counts = [N_SEED, N_SEED + n["n_aug"], "budget"]
+    counts = [N_SEED, N_SEED + n["n_aug"], BUDGET]
     for i, c in enumerate(counts):
         arrow(ax, xs[i] + widths[i] + PAD, xs[i + 1] - PAD, y_mid, f"{c}")
 
@@ -99,7 +99,7 @@ def fig_architecture() -> dict:
     feedback_loop(ax, x_out, x_in, y_edge, y_low)
     ax.text(x_out + 1.4, y_low + 0.1, f"after every batch of {Q_BATCH}: refit the\nGPs and the classifier on all designs",
             ha="left", va="center", fontsize=NOTE, color="0.25", linespacing=1.2)
-    ax.text(xs[0] - PAD, y_low + 0.1, "Arrow labels: cumulative evaluation progress\nWhite strips: FA-MOBO mean per run, ten seeds",
+    ax.text(xs[0] - PAD, y_low + 0.1, "Numbers on arrows: cumulative simulations\nWhite strips: FA-MOBO mean per run, ten seeds",
             ha="left", va="center", fontsize=NOTE, color="0.25", linespacing=1.2)
 
     save(fig, "fig_architecture")

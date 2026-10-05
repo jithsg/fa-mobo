@@ -21,6 +21,8 @@ from pathlib import Path
 import numpy as np
 from scipy.stats import wilcoxon
 
+from bench_tables import DISPLAY   # problem names as written in the text
+
 HERE = Path(__file__).resolve().parent
 _CANDIDATES = (HERE.parent / "circuit_study" / "scripts",            # released layout: circuit study beside benchmarks/
                HERE.parent / "robustness" / "paper_assets")          # original working tree
@@ -124,7 +126,7 @@ def main() -> None:
          r"\begin{tabular}{lcccccc}", r"\toprule",
          r"Problem & $r_{\mathrm{BO}}^{\mathrm{ctl}}$ & $r_{\mathrm{BO}}^{\mathrm{FA}}$ & Direct & Indirect & Measured & $p$ \\", r"\midrule"]
     for r in rows:
-        nm = r"\textbf{" + r["name"] + "}" if r["kind"] == "circuit" else r["name"]
+        nm = r"\textbf{" + r["name"] + "}" if r["kind"] == "circuit" else DISPLAY.get(r["name"], r["name"])
         L.append(f"{nm} & {r['control_bo']:.3f} & {r['fa_bo']:.3f} & {r['direct']:+.2f} & {r['indirect']:+.2f} & "
                  f"{r['measured']:+.2f} & {_pcell(r['p'])} \\\\")
     L += [r"\bottomrule", r"\end{tabular}", r"\end{table*}"]

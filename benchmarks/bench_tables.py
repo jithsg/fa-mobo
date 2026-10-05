@@ -22,6 +22,13 @@ HERE = Path(__file__).resolve().parent
 ARMS = ("FA-MOBO", "Aug-BO", "Clf-BO", "qNEHVI")
 MAIN = "FA-MOBO"
 NO_TARGET_METRIC = ("OSY",)     # hypervolume dominated by one point; see module docstring
+DISPLAY = {"C2DTLZ2": "C2-DTLZ2", "C3DTLZ4": "C3-DTLZ4"}   # problem names as written in the text
+
+
+def display_names(tex: str) -> str:
+    for k, v in DISPLAY.items():
+        tex = tex.replace(k, v)
+    return tex
 
 
 def _ptex(p: float) -> str:
@@ -293,7 +300,7 @@ def main() -> None:
                      ("tab_bench_ranks_feasible", lambda d: table_ranks(d, "feasible", "feasible designs", 2)),
                      ("tab_bench_ranks_hv", lambda d: table_ranks(d, "hv", "hypervolume", 4)),
                      ("tab_s_bench_holm", table_holm)):
-        (out / f"{name}.tex").write_text(fn(data) + "\n")
+        (out / f"{name}.tex").write_text(display_names(fn(data)) + "\n")
         print("wrote", out / f"{name}.tex")
 
 

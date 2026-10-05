@@ -61,9 +61,8 @@ from sklearn.svm import SVC  # noqa: E402
 import matplotlib  # noqa: E402
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
-plt.rcParams.update({"font.size": 8, "axes.titlesize": 8.5, "axes.labelsize": 8, "legend.fontsize": 7,
-                     "xtick.labelsize": 7, "ytick.labelsize": 7, "figure.dpi": 100, "savefig.dpi": 1500,
-                     "savefig.bbox": "tight", "axes.spines.top": False, "axes.spines.right": False})
+from common import style  # noqa: E402
+style()                   # same fonts and sizes as every other figure of the paper
 
 
 # --------------------------------------------------------------------------- encodings

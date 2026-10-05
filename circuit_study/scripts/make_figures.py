@@ -127,11 +127,11 @@ def margin_map_panel(ax, D: pd.DataFrame) -> None:
     hm = F[F["high_margin"]]; by = hm["origin"].value_counts()
     parts = {"seed": "seed", "aug": "augmentation", "bo_clf": "BO with classifier", "bo_plain": "BO without classifier"}
     body = "\n".join(f"{int(by.get(o, 0))} {parts[o]}" for o in ORIGINS if by.get(o, 0))
-    ax.text(K_BANDS[-2] * 0.97, smax * 1.76, f"high-margin (shaded):\nK ≥ {K_MARGIN:g}, slack ≥ {HM_SLACK:.1f} dB\n{len(hm)} designs: {body}",
+    ax.text(K_BANDS[-2] * 0.97, smax * 1.76, f"high-margin (shaded):\nK ≥ {K_MARGIN:g}, margin ≥ {HM_SLACK:.1f} dB\n{len(hm)} designs: {body}",
             ha="right", va="top", fontsize=NOTE, color="0.15", linespacing=1.12, zorder=8)
     ax.legend(handles=origin_handles(counts), loc="upper left", fontsize=NOTE, handletextpad=0.2, borderaxespad=0.3, labelspacing=0.22,
               title=f"{len(F)} distinct feasible designs", title_fontsize=NOTE, alignment="left")
-    ax.set_xlabel("Nominal Rollett K (TT, 27 °C)"); ax.set_ylabel(f"OP1dB slack = OP1dB − {OP1DB_MARGIN - HM_SLACK:g} dBm (dB)")
+    ax.set_xlabel("Nominal stability score K"); ax.set_ylabel("Output-power margin (dB)")
     ax.set_title("(b) Margin map of the returned designs")
     FIGNUM["reliability_margin_map"] = {"n_feasible_distinct": int(len(F)), "by_origin": counts, "n_high_margin": int(len(hm)),
                                         "high_margin_by_origin": {o: int(by.get(o, 0)) for o in ORIGINS}, "max_K": kmax, "max_slack": smax}
@@ -154,7 +154,7 @@ def fig_reliability() -> None:
     FIGNUM["reliability_ea_reach"] = {m: (None if not np.isfinite(r) else int(r)) for m, r in ea_reach.items()}
     ax.text(0.97, 0.47, f"joint target:\n≥ {JOINT_FEASIBLE} strictly feasible designs\nand ≥ {JOINT_NEW_HM} new high-margin design",
             transform=ax.transAxes, ha="right", va="top", fontsize=NOTE, color="0.3", linespacing=1.15)
-    ax.set_xlabel("Harmonic-balance simulations"); ax.set_ylabel(f"Fraction of the {N_RUNS} runs\nthat reached the joint target")
+    ax.set_xlabel("Circuit simulations"); ax.set_ylabel(f"Fraction of the {N_RUNS} runs\nthat reached the joint target")
     ax.set_title("(a) Runs reaching the joint target")
     FIGNUM["reliability_reach"] = reach_summary(reach)
     margin_map_panel(axes[1], pooled_designs())
@@ -178,7 +178,7 @@ def progress_panel(ax, curves: dict, ylabel: str, title: str) -> None:
         ax.plot(x, m, label=short(arm), **lkw(arm))
         if arm in (MAIN, "qn"):
             ax.fill_between(x, m - sd, m + sd, color=col(arm), alpha=0.13, lw=0, zorder=1)
-    ax.set_xlim(N_SEED - 4, BUDGET); ax.set_xticks([100, 120, 140, 160, 181]); ax.set_xlabel("Harmonic-balance simulations")
+    ax.set_xlim(N_SEED - 4, BUDGET); ax.set_xticks([100, 120, 140, 160, 181]); ax.set_xlabel("Circuit simulations")
     lo, hi = ax.get_ylim(); ax.set_ylim(lo, hi + 0.10 * (hi - lo))
     ax.set_ylabel(ylabel); ax.set_title(title)
 
@@ -204,7 +204,7 @@ def fig_progression() -> None:
     n_aug = int(PS[PS["arm"] == MAIN]["n_aug"].iloc[0])
     fig, axes = plt.subplots(1, 3, figsize=(W, 2.7))
     seed_hm = int(PS[PS["arm"] == MAIN]["k15_lhs"].iloc[0])
-    metrics = (("hv", lambda h: h["cum_hv"].to_numpy(), "Dominated hypervolume\n(PAE × Psat, ref. 0, 0)", "(a) Hypervolume"),
+    metrics = (("hv", lambda h: h["cum_hv"].to_numpy(), "Hypervolume of the\n(PAE, Psat) front", "(a) Hypervolume"),
                ("feasible", lambda h: np.cumsum(feasible_mask(h).to_numpy()), "Strictly feasible designs", "(b) Strictly feasible designs"),
                ("k15", lambda h: np.cumsum(margin_rich(h).to_numpy()), f"High-margin designs\n(incl. {seed_hm} from the shared seed)", "(c) High-margin designs"))
     for ax, (key, fn, ylab, title) in zip(axes, metrics):
@@ -325,8 +325,8 @@ def bound_panel(ax) -> None:
     ends = {a: res[short(a)]["mean_pct"][2] for a in ARMS}
     direct_labels(ax, 3.32, ends, lambda a: f"{short(a)} {res[short(a)]['mean_pct'][0]:.0f} → {res[short(a)]['mean_pct'][2]:.0f} %", 9.0, 0, 100, NOTE)
     ax.set_xticks(xs); ax.set_xticklabels(["first", "middle", "last"]); ax.set_xlim(0.7, 3.25); ax.set_ylim(-3, 113); ax.set_yticks(range(0, 101, 20))
-    ax.set_xlabel("Third of the BO phase"); ax.set_ylabel(f"BO proposals at the {W_MIN_UM:.0f} µm\nswitch-width bound (%)")
-    ax.set_title(f"(a) Drift to the {W_MIN_UM:.0f} µm width bound")
+    ax.set_xlabel("Third of the BO phase"); ax.set_ylabel(f"BO proposals at the minimum\ntransistor width, {W_MIN_UM:.0f} µm (%)")
+    ax.set_title("(a) Drift to the minimum transistor width")
     ax.text(0.03, 0.97, f"mean ± s.d. of {N_RUNS} seeds (clipped at 0 and 100 %)", transform=ax.transAxes, fontsize=NOTE, color="0.35", va="top")
     FIGNUM["mechanism_bound_share"] = res
 
@@ -349,7 +349,7 @@ def band_panel(ax, D: pd.DataFrame) -> None:
     ax.vlines(K_MARGIN, ymin - 1.0, 5 * np.ceil(ymax / 5), color="0.45", lw=0.6, ls="--", zorder=1)   # K = 15 guide, below the legend
     hs = [Line2D([], [], color="k", lw=1.5, label="best PAE in the K band")] + origin_handles(counts)
     leg = ax.legend(handles=hs, loc="upper center", ncol=2, fontsize=NOTE, handlelength=1.2, handletextpad=0.5, labelspacing=0.2, borderaxespad=0.2, columnspacing=0.8)   # line handle clear of its text and of the y spine
-    ax.set_xlabel("Nominal Rollett K (TT, 27 °C)"); ax.set_ylabel("PAE (%)")
+    ax.set_xlabel("Nominal stability score K"); ax.set_ylabel("PAE (%)")
     ax.set_title("(b) Best PAE per stability-margin band")
     FIGNUM["mechanism_k_bands"] = {"rows": rows, "n_feasible_distinct": int(len(F)), "by_origin": counts}
 
@@ -384,21 +384,21 @@ def fig_corner_sweep() -> None:
     ax.axvline(K_MARGIN, color="0.4", lw=0.7, ls=":"); ax.text(K_MARGIN + 0.3, _ktrans(-24), f"K = {K_MARGIN:.0f}", fontsize=NOTE, color="0.3", va="bottom")
     g = pooled.groupby("sig"); des = pd.DataFrame({"tt_K": g.tt_K.first(), "stable_all": g.minKf.min() >= 1})
     hi = des[des.tt_K >= K_MARGIN]; lo = des[des.tt_K < K_MARGIN]
-    ax.text(0.98, 0.62, f"{len(des)} distinct designs\nnominal K ≥ {K_MARGIN:.0f}: {int(hi.stable_all.sum())} / {len(hi)} stable at every corner\nnominal K < {K_MARGIN:.0f}: {int(lo.stable_all.sum())} / {len(lo)} ({lo.stable_all.mean() * 100:.0f} %)\nno design with nominal K in {lo.tt_K.max():.1f}–{hi.tt_K.min():.1f}",
+    ax.text(0.98, 0.62, f"{len(des)} distinct designs\nnominal K ≥ {K_MARGIN:.0f}: {int(hi.stable_all.sum())} / {len(hi)} stable in every scenario\nnominal K < {K_MARGIN:.0f}: {int(lo.stable_all.sum())} / {len(lo)} ({lo.stable_all.mean() * 100:.0f} %)\nno design with nominal K in {lo.tt_K.max():.1f}–{hi.tt_K.min():.1f}",
             transform=ax.transAxes, fontsize=NOTE, color="0.2", ha="right", va="top")   # top below the K = 1 line (axes 0.67), clear of its label
-    ax.set_xlabel("Nominal Rollett K (TT, 27 °C)"); ax.set_ylabel("Rollett K at FF, −40 °C (log-compressed)"); ax.set_title("(a) Stability at the worst corner")
+    ax.set_xlabel("Nominal stability score K"); ax.set_ylabel("K in the hardest scenario,\nFF −40 °C (log-compressed)"); ax.set_title("(a) Stability in the hardest scenario")
     handles = [Line2D([], [], marker="o", ls="", mfc=ARMS["fa15qc"][2], mec=ARMS["fa15qc"][2], label="FA-MOBO design"), Line2D([], [], marker="s", ls="", mfc=ARMS["qn"][2], mec=ARMS["qn"][2], label="qNEHVI design"),
-               Line2D([], [], marker="o", ls="", mfc="white", mec="0.3", label="hollow: unstable at some corner")]
+               Line2D([], [], marker="o", ls="", mfc="white", mec="0.3", label="hollow: unstable in some scenario")]
     ax.legend(handles=handles, loc="lower right", fontsize=NOTE, handletextpad=0.4)
     ax = axes[1]; corners = ["TT/27C", "FF/27C", "SS/27C", "FF/-40C", "SS/85C"]; xs = np.arange(len(corners)); w = 0.36
     n = pooled.sig.nunique(); shares = {}
-    for k, (cname, lab, colr) in enumerate((("stable", "unconditionally stable (K ≥ 1)", "0.72"), ("pass_strict", "all six specifications met", "0.25"))):
+    for k, (cname, lab, colr) in enumerate((("stable", "stable (K ≥ 1)", "0.72"), ("pass_strict", "all six requirements met", "0.25"))):
         vals = [pooled[pooled.corner == c][cname].mean() * 100 for c in corners]; shares[cname] = dict(zip(corners, vals))
         bars = ax.bar(xs + (k - 0.5) * w, vals, width=w, color=colr, lw=0, label=lab)
         for b, v in zip(bars, vals):
             ax.text(b.get_x() + b.get_width() / 2, v + 2, f"{v:.0f}", ha="center", fontsize=NOTE, color="0.25")
     ax.set_xticks(xs); ax.set_xticklabels([c.replace("C", " °C").replace("-", "−").replace("/", "\n") for c in corners])
-    ax.set_ylabel(f"Share of the {n} distinct designs (%)"); ax.set_ylim(0, 118); ax.set_yticks([0, 25, 50, 75, 100]); ax.set_title("(b) Outcome per corner, fixed bias")
+    ax.set_ylabel(f"Share of the {n} distinct designs (%)"); ax.set_ylim(0, 118); ax.set_yticks([0, 25, 50, 75, 100]); ax.set_title("(b) Outcome per operating scenario")
     ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.22), ncol=2, fontsize=NOTE)
     FIGNUM["corner_sweep"] = {"n_distinct": int(len(des)), "hi_stable": int(hi.stable_all.sum()), "hi_n": int(len(hi)), "lo_stable": int(lo.stable_all.sum()),
                               "lo_n": int(len(lo)), "k_gap": [float(lo.tt_K.max()), float(hi.tt_K.min())], "corner_share_pct": shares}

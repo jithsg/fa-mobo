@@ -53,7 +53,7 @@ def strip(ax, n: dict) -> None:
         ax.add_patch(FancyArrowPatch((x0, 15), (x1, 15), arrowstyle="-|>", mutation_scale=9, lw=0.8, color="0.2"))
         ax.text((x0 + x1) / 2, 17.0, t, ha="center", fontsize=NOTE, color="0.25")
 
-    box(0.5, 23.5, f"Phase I\n{N_SEED}-design LHS seed", f"2.4 GHz Class-E PA\n40 nm CMOS, PDK spirals\n{n['seed_feasible']} of {N_SEED} strictly feasible", BOX_COLORS["seed"])
+    box(0.5, 23.5, f"Phase I\n{N_SEED}-design LHS seed", f"2.4 GHz Class-E PA\n40 nm CMOS, library inductors\n{n['seed_feasible']} of {N_SEED} strictly feasible", BOX_COLORS["seed"])
     box(28, 25.5, f"Phase II\nfeasibility augmentation ({n['n_aug']})", f"RF ensembles rank candidates\nby P(feasible) × efficiency\n{n['aug_feasible']:.1f} feasible, {n['aug_hm']:.1f} high-margin", BOX_COLORS["aug"])
     box(57.5, 25.5, f"Phase III\nclassifier-guided MOBO ({n['n_opt']})", f"qLogNEHVI weighted by an\nin-loop feasibility classifier\n{n['bo_feasible']:.1f} of {n['n_opt']} feasible", BOX_COLORS["bo"])
     box(87, 12.5, f"Output ({BUDGET})\nvs qNEHVI", f"{n['feas_ratio_qn']:.1f}× feasible\n{n['hm_ratio_qn']:.1f}× high-margin\nper run", BOX_COLORS["out"])

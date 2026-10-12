@@ -33,7 +33,7 @@ PS = per_seed_table()
 PS["hv_m"] = [hv_margin(load_hist(a, s)) for a, s in zip(PS["arm"], PS["seed"])]
 FIGNUM: dict = {}                                          # every number printed on a figure
 NOTE = FS["note"]                                          # smallest text size on any figure (7 pt; prints at ~6.7 pt at 468 pt text width)
-ORIGIN_SHORT = {"seed": "shared LHS seed", "aug": "augmentation phase", "bo_clf": "BO with classifier", "bo_plain": "BO without classifier"}
+ORIGIN_SHORT = {"seed": "common initial sample", "aug": "augmentation phase", "bo_clf": "acquisition, classifier", "bo_plain": "acquisition, no classifier"}
 K_TICKS = [5, 7.5, 10, 15, 20, 30]                         # nominal-K ticks shared by the design-level panels
 
 
@@ -125,7 +125,7 @@ def margin_map_panel(ax, D: pd.DataFrame) -> None:
     kmax = float(F["minKf"].max()); smax = float(F["slack"].max())
     log_k_axis(ax, K_BANDS[0], K_BANDS[-2], K_TICKS); ax.set_ylim(-0.03, smax * 1.80)
     hm = F[F["high_margin"]]; by = hm["origin"].value_counts()
-    parts = {"seed": "seed", "aug": "augmentation", "bo_clf": "BO with classifier", "bo_plain": "BO without classifier"}
+    parts = {"seed": "initial sample", "aug": "augmentation", "bo_clf": "with classifier", "bo_plain": "without classifier"}
     body = "\n".join(f"{int(by.get(o, 0))} {parts[o]}" for o in ORIGINS if by.get(o, 0))
     ax.text(K_BANDS[-2] * 0.97, smax * 1.76, f"high-margin (shaded):\nK ≥ {K_MARGIN:g}, margin ≥ {HM_SLACK:.1f} dB\n{len(hm)} designs: {body}",
             ha="right", va="top", fontsize=NOTE, color="0.15", linespacing=1.12, zorder=8)
@@ -257,7 +257,7 @@ def fig_ablation() -> None:
 def phase_origin_panel(ax) -> None:
     arms = list(ARMS); xs = np.arange(len(arms)); g = PS.groupby("arm")
     seed_part = g["k15_lhs"].mean(); aug = g["k15_aug"].mean(); opt = g["k15_opt"].mean(); tot = g["k15"].mean()
-    ax.bar(xs, [seed_part[a] for a in arms], color=PHASE_COLORS["seed"], width=0.62, label="shared LHS seed")
+    ax.bar(xs, [seed_part[a] for a in arms], color=PHASE_COLORS["seed"], width=0.62, label="common initial sample")
     ax.bar(xs, [aug[a] for a in arms], bottom=[seed_part[a] for a in arms], color=PHASE_COLORS["aug"], width=0.62, label="augmentation phase")
     ax.bar(xs, [opt[a] for a in arms], bottom=[seed_part[a] + aug[a] for a in arms], color=PHASE_COLORS["bo"], width=0.62, label="BO phase")
     for i, a in enumerate(arms):
@@ -325,7 +325,7 @@ def bound_panel(ax) -> None:
     ends = {a: res[short(a)]["mean_pct"][2] for a in ARMS}
     direct_labels(ax, 3.32, ends, lambda a: f"{short(a)} {res[short(a)]['mean_pct'][0]:.0f} → {res[short(a)]['mean_pct'][2]:.0f} %", 9.0, 0, 100, NOTE)
     ax.set_xticks(xs); ax.set_xticklabels(["first", "middle", "last"]); ax.set_xlim(0.7, 3.25); ax.set_ylim(-3, 113); ax.set_yticks(range(0, 101, 20))
-    ax.set_xlabel("Third of the BO phase"); ax.set_ylabel(f"BO proposals at the minimum\ntransistor width, {W_MIN_UM:.0f} µm (%)")
+    ax.set_xlabel("Third of the acquisition phase"); ax.set_ylabel(f"Proposals at the minimum\ntransistor width, {W_MIN_UM:.0f} µm (%)")
     ax.set_title("(a) Drift to the minimum transistor width")
     ax.text(0.03, 0.97, f"mean ± s.d. of {N_RUNS} seeds (clipped at 0 and 100 %)", transform=ax.transAxes, fontsize=NOTE, color="0.35", va="top")
     FIGNUM["mechanism_bound_share"] = res
@@ -348,14 +348,14 @@ def band_panel(ax, D: pd.DataFrame) -> None:
     ax.set_ylim(ymin - 1.0, ymax + 11.0); ax.set_yticks(np.arange(5 * np.ceil(ymin / 5), 5 * np.ceil(ymax / 5) + 0.1, 5))
     ax.vlines(K_MARGIN, ymin - 1.0, 5 * np.ceil(ymax / 5), color="0.45", lw=0.6, ls="--", zorder=1)   # K = 15 guide, below the legend
     hs = [Line2D([], [], color="k", lw=1.5, label="best PAE in the K band")] + origin_handles(counts)
-    leg = ax.legend(handles=hs, loc="upper center", ncol=2, fontsize=NOTE, handlelength=1.2, handletextpad=0.5, labelspacing=0.2, borderaxespad=0.2, columnspacing=0.8)   # line handle clear of its text and of the y spine
+    leg = ax.legend(handles=hs, loc="upper center", ncol=2, fontsize=NOTE, handlelength=1.2, handletextpad=0.4, labelspacing=0.2, borderaxespad=0.2, columnspacing=0.5)   # line handle clear of its text and of the y spine
     ax.set_xlabel("Nominal stability score K"); ax.set_ylabel("PAE (%)")
     ax.set_title("(b) Best PAE per stability-margin band")
     FIGNUM["mechanism_k_bands"] = {"rows": rows, "n_feasible_distinct": int(len(F)), "by_origin": counts}
 
 
 def fig_mechanism() -> None:
-    fig, axes = plt.subplots(1, 2, figsize=(W, 2.8), gridspec_kw={"width_ratios": [1.0, 1.12]})
+    fig, axes = plt.subplots(1, 2, figsize=(W, 2.8), gridspec_kw={"width_ratios": [0.88, 1.26]})
     bound_panel(axes[0])
     band_panel(axes[1], pooled_designs())
     fig.tight_layout(w_pad=1.0)

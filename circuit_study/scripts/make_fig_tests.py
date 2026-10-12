@@ -19,7 +19,7 @@ style()
 OTHERS = mt.OTHERS
 SIG = 0.05
 # (key, panel title, decimals); joint-target panels use counts (positive = favours FA-MOBO)
-CONT = [("feasible", "Strictly feasible designs", 1), ("high_margin", "High-margin designs", 1),
+CONT = [("feasible", "Feasible designs", 1), ("high_margin", "High-margin designs", 1),
         ("hv3", "Margin-aware hypervolume", 0), ("hv2", "2-D hypervolume", 0),
         ("best_pae", "Best PAE (%)", 1), ("best_pae_hm", "Best PAE, high-margin (%)$^\\dagger$", 1)]
 MS_TESTS_TEX = ROOT.parent.parent / "Manuscript" / "LaTeX_Source" / "tables" / "tab_ms_tests.tex"
@@ -88,11 +88,11 @@ def main() -> None:
         first = i % 4 == 0; L = next(letters)
         if kind == "cont":
             key, title, d = spec
-            forest(ax, [vs[a][key] for a in OTHERS], f"({L}) {title}", d, first, "FA-MOBO minus arm")
+            forest(ax, [vs[a][key] for a in OTHERS], f"({L}) {title}", d, first, "FA-MOBO minus alternative")
         elif kind == "reached":
             m = [vs[a]["joint_target_mcnemar"] for a in OTHERS]
             counts(ax, [x["fa_only"] for x in m], [x["arm_only"] for x in m], [x["p"] for x in m],
-                   f"({L}) Joint target reached", first, "seeds: FA-MOBO only / arm only")
+                   f"({L}) Joint target reached", first, "seeds: FA-MOBO only / alternative only")
         else:
             s = [vs[a]["joint_target_sooner"] for a in OTHERS]
             counts(ax, [x["sooner"] for x in s], [x["later"] for x in s], [x["p"] for x in s],

@@ -118,7 +118,7 @@ def table_selected_design() -> str:
     assert entry(sb, "Lx_id", "Lx_") == entry(ss, "Lx_id", "Lx_") and entry(sb, "Ldc3_id", "Ldc3_") == entry(ss, "Ldc3_id", "Ldc3_")
     L += [r"\bottomrule", r"\end{tabular}", r"\par\smallskip", r"\begin{minipage}{0.96\linewidth}", r"\footnotesize",
           r"\textit{Reading note.} Spec. denotes the requirement threshold. TT, FF and SS denote typical--typical, fast--fast and slow--slow process scenarios, respectively. "
-          r"The reference was fixed before optimization. The FA-MOBO design is the highest-efficiency evaluated design with nominal $K\geq15$. "
+          r"The reference was fixed before optimization. The FA-MOBO design is the highest-efficiency corner-swept FA-MOBO design with nominal $K\geq15$. "
           f"Both use $L_x$ entry {entry(sb, 'Lx_id', 'Lx_')} and $L_{{\\mathrm{{dc3}}}}$ entry {entry(sb, 'Ldc3_id', 'Ldc3_')}. "
           f"Their $W_{{\\mathrm{{M3}}}}$ values are {sb['M3_width']:.0f} and {ss['M3_width']:.0f}\\,$\\mu$m, respectively. "
           r"Bold values miss the stated requirement. \textit{Key takeaway.} FA-MOBO improves nominal efficiency and remains stable in every tested scenario, "

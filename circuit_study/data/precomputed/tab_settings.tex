@@ -1,6 +1,6 @@
 \begin{table}[pos=htbp]
 \centering
-\caption{Settings of FA-MOBO as run in all experiments (values read from the implementation). The baseline configurations use the same Phase III settings; qNEHVI and Aug-BO omit the classifier ($w=0$), and qNEHVI+m adds a 0.3\,dB margin to the $OP_{1dB}$ constraint.}
+\caption{Implementation settings used in the circuit experiments.}
 \label{tab:settings}
 \footnotesize
 \begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.0cm}>{\raggedright\arraybackslash}p{12.8cm}@{}}
@@ -13,18 +13,23 @@ Kernel and priors & RBF, ARD (10 lengthscales); LogNormalPrior lengthscale prior
 Inputs / outputs & unit cube, 4 continuous variables + 3-D $(L,Q,\mathrm{SRF})$ embedding per inductor (10 dimensions); outputs standardized \\
 Fitting & marginal likelihood maximization, refitted after every batch \\
 \multicolumn{2}{@{}l}{\textit{Acquisition (Phase III)}} \\
-Criterion & qLogNEHVI, reference point inferred from the observed feasible Pareto front, constraint smoothing $\eta=0.001$ \\
+Criterion & qLogNEHVI, reference point inferred from the observed feasible Pareto front, constraint-smoothing parameter $\eta=0.001$ \\
 Monte Carlo & 64 Sobol quasi-Monte Carlo samples \\
-Batch and optimizer & $q=3$, sequential greedy; L-BFGS-B, 3 restarts from 128 raw samples, at most 100 iterations \\
-Feasibility classifier & random forest, 300 trees, minimum leaf 2, balanced-subsample class weights; weight $w=1$, $\epsilon=0.001$; refitted before every batch on all simulated designs with valid metrics (the GP training set) \\
-Discrete inductors & snap to nearest library entry with SRF $\geq 3f_0$; distance weights $L$ 1, $Q$ 0.25, SRF 0.1 \\
+Batch and optimizer & batch size $q=3$, sequential greedy; L-BFGS-B, 3 restarts from 128 raw samples, at most 100 iterations \\
+Feasibility classifier & random forest, 300 trees, minimum leaf 2, balanced-subsample class weights; classifier weight $w=1$, numerical stabilizer $\epsilon=0.001$; refitted before every batch on all simulated designs with valid metrics (the GP training set) \\
+Discrete inductors & snap to nearest library entry with SRF $\geq 3f_0$, where $f_0=2.4$\,GHz is the operating frequency; distance weights for value $L$, quality factor $Q$ and self-resonant frequency SRF are 1, 0.25 and 0.1 \\
 \multicolumn{2}{@{}l}{\textit{Feasibility augmentation (Phase II, Algorithm~\ref{alg:augmentation})}} \\
 Labels & near-feasible: all six constraints with $OP_{1dB}$ relaxed by 1\,dB \\
 Ensembles & sizes 5, 10, 15 random forests, 600 trees each, minimum leaf 2, each forest on its own bootstrap resample of the seed \\
-Candidates and score & 20,000 Latin-hypercube candidates within the observed seed bounds; risk weight $\lambda=0.5$; efficiency weight exponent 1 \\
-Selection & $N_{\mathrm{over}}=25$ per ensemble, diversity cap $\kappa=18$ per inductor, top $N_{\mathrm{select}}=15$ simulated \\
+Candidates and score & 20,000 Latin-hypercube candidates within the observed seed bounds; uncertainty-penalty weight $\lambda=0.5$; efficiency exponent $\gamma=1$ \\
+Selection & retained candidates $N_{\mathrm{over}}=25$ per ensemble, diversity cap $\kappa=18$ per inductor, shortlist size $N_{\mathrm{select}}=45$, of which the 15 highest-ranked designs are simulated \\
 \multicolumn{2}{@{}l}{\textit{Software}} \\
 Libraries & BoTorch 0.12.0, GPyTorch 1.13, scikit-learn 1.7.2, PyTorch 2.13.0 \\
 \bottomrule
 \end{tabular}
+\par\smallskip
+\begin{minipage}{0.94\textwidth}
+\footnotesize
+\textit{Reading note.} RBF denotes the radial-basis-function kernel. ARD assigns a separate GP lengthscale to each input, and SRF is self-resonant frequency. L-BFGS-B is the bounded numerical optimizer used to maximize the acquisition. All Bayesian configurations use the same Phase~III settings. qNEHVI and Aug-BO omit classifier weighting ($w=0$), while qNEHVI+m adds 0.3\,dB to the $OP_{1dB}$ requirement. \textit{Key takeaway.} Paired comparisons keep the shared settings fixed and alter only the named augmentation, classifier or margin component.
+\end{minipage}
 \end{table}

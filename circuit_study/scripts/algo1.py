@@ -1,11 +1,12 @@
 """Faithful implementation of the paper's Algorithm 1 (feasibility augmentation).
 
-Reproduces the exact pipeline used to produce the 45 augmentation candidates:
+Reproduces the exact pipeline used to produce the 45-design augmentation shortlist:
 near-feasible labelling (OP1dB relaxed by 1 dB), three bootstrap RF ensembles
 (sizes 5/10/15), risk-adjusted scoring of a 20k LHS candidate pool
 (score = p_mean - lambda * p_std), over-selection of the top-25 per ensemble,
 union pooling, mean-rank aggregation, and diversity-capped greedy selection
-(max 18 per Lx id / Ldc3 id, final N = 45).
+(max 18 per Lx id / Ldc3 id, shortlist N = 45). FA-MOBO simulates the 15
+highest-ranked designs of the shortlist (make_sensitivity.N_AUG).
 
 Constants match the original run in Liu-5_10_15.ipynb; every knob is exposed
 as a parameter so the sensitivity and stability studies can sweep them.
@@ -44,7 +45,8 @@ class Algo1Config:
     # Tweak 2 (2026-09-13): weight each candidate's risk-adjusted feasibility
     # score by its predicted efficiency, q(x)^pae_weight with q = clip(PAE_hat /
     # PAE_ref, 0, 1) from a random-forest PAE regressor fitted on the LHS set
-    # (PAE_ref = best near-feasible LHS PAE). 0 disables it (paper behaviour).
+    # (PAE_ref = best near-feasible LHS PAE). 0 disables it. The reported FA-MOBO
+    # runs use pae_weight=1.0 (efficiency exponent gamma = 1; make_sensitivity.BASE).
     pae_weight: float = 0.0
 
 

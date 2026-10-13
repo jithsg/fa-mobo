@@ -37,9 +37,9 @@ def _attainment(arm: str, grid: np.ndarray, k: int) -> np.ndarray:
 
 
 def fig_attainment() -> None:
+    """Main text: median fronts of every configuration. Supplementary: FA-MOBO's attainment band and high-margin designs."""
     grid = np.arange(20.0, 45.01, 0.02)
-    fig, axes = plt.subplots(1, 2, figsize=(7.0, 3.5), sharey=True)
-    ax = axes[0]
+    fig, ax = plt.subplots(figsize=(4.6, 3.7))
     for arm, (short, _, col, ls, lw) in ARMS.items():
         y = _attainment(arm, grid, 5); ok = np.isfinite(y)
         ax.step(grid[ok], y[ok], where="post", color=col, ls=ls, lw=lw, label=short, zorder=4 if arm == MAIN else 3)
@@ -55,9 +55,13 @@ def fig_attainment() -> None:
                 marker="o" if solo else None, markevery=[int(np.flatnonzero(ok)[-1])] if solo else None, ms=4, mfc="white", mec=EA_COLOR, mew=0.8,
                 label=", ".join(same) + (" (1 run each)" if len(same) > 1 else " (1 run)"))
         drawn.append(m)
-    ax.set_title("(a) Median fronts (10 seeds); evolutionary baselines, one run each"); ax.set_xlabel("PAE (%)"); ax.set_ylabel("Psat (dBm)")
+    ax.set_title("Median fronts (10 seeds); evolutionary baselines, one run each"); ax.set_xlabel("PAE (%)"); ax.set_ylabel("Psat (dBm)")
     ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.2), ncol=3, frameon=False, fontsize=FS["legend"], columnspacing=1.0, handletextpad=0.4)
-    ax = axes[1]; col = ARMS[MAIN][2]
+    ax.set_xlim(20, 45.5); ylim = ax.get_ylim()
+    fig.tight_layout()
+    save(fig, "fig_attainment")
+
+    fig, ax = plt.subplots(figsize=(4.6, 3.7)); col = ARMS[MAIN][2]
     for k, lab, alpha in ((1, "best run (1 of 10)", 0.35), (5, "median (5 of 10)", 1.0), (10, "worst run (10 of 10)", 0.6)):
         y = _attainment(MAIN, grid, k); ok = np.isfinite(y)
         ax.step(grid[ok], y[ok], where="post", color=col, lw=1.8 if k == 5 else 1.0, ls="-" if k == 5 else "--", alpha=alpha, label=f"FA-MOBO {lab}")
@@ -65,12 +69,11 @@ def fig_attainment() -> None:
     ax.step(grid[ok], yq[ok], where="post", color=ARMS["qn"][2], lw=0.9, label="qNEHVI median")
     hm = pd.concat([load_hist(MAIN, s).pipe(lambda h: h[margin_rich(h)]) for s in SEEDS]).drop_duplicates(KEY)
     ax.scatter(hm.PAE_percent, hm.Psat_dBm, marker="D", s=16, facecolor=col, edgecolor="k", lw=0.4, zorder=5, label=f"FA-MOBO high-margin designs ({len(hm)})")
-    ax.set_title("(b) FA-MOBO attainment band and high-margin designs"); ax.set_xlabel("PAE (%)")
+    ax.set_title("FA-MOBO attainment band and high-margin designs"); ax.set_xlabel("PAE (%)"); ax.set_ylabel("Psat (dBm)")
     ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.2), ncol=2, frameon=False, fontsize=FS["legend"])
-    for a in axes:
-        a.set_xlim(20, 45.5)
-    fig.tight_layout(w_pad=1.2)
-    save(fig, "fig_attainment")
+    ax.set_xlim(20, 45.5); ax.set_ylim(min(ylim[0], ax.get_ylim()[0]), max(ylim[1], ax.get_ylim()[1]))
+    fig.tight_layout()
+    save(fig, "fig_s_attainment_band")
 
 
 # ---------------------------------------------------------------- selected design across corners

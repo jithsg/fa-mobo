@@ -55,7 +55,7 @@ def fig_attainment() -> None:
                 marker="o" if solo else None, markevery=[int(np.flatnonzero(ok)[-1])] if solo else None, ms=4, mfc="white", mec=EA_COLOR, mew=0.8,
                 label=", ".join(same) + (" (1 run each)" if len(same) > 1 else " (1 run)"))
         drawn.append(m)
-    ax.set_title("(a) Median fronts (10 seeds); EA single runs"); ax.set_xlabel("PAE (%)"); ax.set_ylabel("Psat (dBm)")
+    ax.set_title("(a) Median fronts (10 seeds); evolutionary baselines, one run each"); ax.set_xlabel("PAE (%)"); ax.set_ylabel("Psat (dBm)")
     ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.2), ncol=3, frameon=False, fontsize=FS["legend"], columnspacing=1.0, handletextpad=0.4)
     ax = axes[1]; col = ARMS[MAIN][2]
     for k, lab, alpha in ((1, "best run (1 of 10)", 0.35), (5, "median (5 of 10)", 1.0), (10, "worst run (10 of 10)", 0.6)):
@@ -102,17 +102,25 @@ def table_selected_design() -> str:
         return s
     lab = lambda c: c.replace("C", "\\,$^\\circ$C").replace("/-", " $-$").replace("/", " ")
     sb = rows["base"].loc["TT/27C"]; ss = rows["sel"].loc["TT/27C"]
-    dv = lambda r: (f"$L_x$ library entry {r['Lx_id'].replace('Lx_', '')}, $L_{{\\mathrm{{dc3}}}}$ entry {r['Ldc3_id'].replace('Ldc3_', '')}, "
-                    f"$W_{{\\mathrm{{M3}}}}={r['M3_width']:.0f}$\\,$\\mu$m")
     L = [r"\begin{table}[pos=htbp]", r"\centering",
-         r"\caption{Selected designs at the nominal and four process--temperature corners with fixed bias. Baseline: the manual baseline design (the best strictly feasible design of the shared seed; " + dv(sb) + r"). FA-MOBO: the highest-$PAE$ FA-MOBO design with nominal $K\geq15$ among the corner-swept designs (seed " + str(sel_seed) + r", augmentation phase; " + dv(ss) + r"). FA-MOBO runs also produced high-margin designs with higher nominal $PAE$ that were not in the corner sweep (Section~\ref{sec:corners}). Bold: specification not met at that corner.}",
+         r"\caption{Replicated reference and selected FA-MOBO design under nominal and four process--temperature scenarios.}",
          r"\label{tab:selected_design}", r"\footnotesize", r"\setlength{\tabcolsep}{2pt}",
-         r"\begin{tabular}{@{}llccccc|ccccc@{}}", r"\toprule",
-         r" & & \multicolumn{5}{c|}{Manual baseline} & \multicolumn{5}{c}{FA-MOBO} \\",
+         r"\begin{tabular}{@{}llccccc@{\hspace{8pt}}ccccc@{}}", r"\toprule",   # no vertical rules (journal style)
+         r" & & \multicolumn{5}{c}{Replicated reference} & \multicolumn{5}{c}{FA-MOBO} \\",
+         r"\cmidrule(lr){3-7}\cmidrule(lr){8-12}",
          r"Metric & Spec. & " + " & ".join(lab(c) for c in corners) + " & " + " & ".join(lab(c) for c in corners) + r" \\", r"\midrule"]
     for col, name, spec, dec in metrics:
         L.append(f"{name} & {spec} & " + " & ".join(cell(col, rows['base'].loc[c, col], dec) for c in corners) + " & " + " & ".join(cell(col, rows['sel'].loc[c, col], dec) for c in corners) + r" \\")
-    L += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
+    entry = lambda r, k, p: r[k].replace(p, "")
+    assert entry(sb, "Lx_id", "Lx_") == entry(ss, "Lx_id", "Lx_") and entry(sb, "Ldc3_id", "Ldc3_") == entry(ss, "Ldc3_id", "Ldc3_")
+    L += [r"\bottomrule", r"\end{tabular}", r"\par\smallskip", r"\begin{minipage}{0.96\linewidth}", r"\footnotesize",
+          r"\textit{Reading note.} Spec. denotes the requirement threshold. TT, FF and SS denote typical--typical, fast--fast and slow--slow process scenarios, respectively. "
+          r"The reference was fixed before optimization. The FA-MOBO design is the highest-efficiency evaluated design with nominal $K\geq15$. "
+          f"Both use $L_x$ entry {entry(sb, 'Lx_id', 'Lx_')} and $L_{{\\mathrm{{dc3}}}}$ entry {entry(sb, 'Ldc3_id', 'Ldc3_')}. "
+          f"Their $W_{{\\mathrm{{M3}}}}$ values are {sb['M3_width']:.0f} and {ss['M3_width']:.0f}\\,$\\mu$m, respectively. "
+          r"Bold values miss the stated requirement. \textit{Key takeaway.} FA-MOBO improves nominal efficiency and remains stable in every tested scenario, "
+          r"although neither design satisfies every performance requirement in every scenario.",
+          r"\end{minipage}", r"\end{table}"]
     info = {"baseline_sig": base_sig, "selected_sig": sel_sig, "selected_seed": sel_seed,
             "baseline_tt": {k: float(sb[k]) for k in ("PAE_percent", "Psat_dBm", "OP1dB_dBm", "minKf")},
             "selected_tt": {k: float(ss[k]) for k in ("PAE_percent", "Psat_dBm", "OP1dB_dBm", "minKf")},

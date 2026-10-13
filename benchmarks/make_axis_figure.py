@@ -51,7 +51,7 @@ def main() -> None:
             t.set_weight("bold")
     ax.set_xlim(-8.6, 15.4); ax.set_ylim(-0.6, len(rows) - 0.4)
     ax.set_xlabel("Feasible designs per run, FA-MOBO minus qNEHVI")
-    ax.text(-0.015, len(rows) - 0.4, "problem (qNEHVI BO yield)", transform=ax.get_yaxis_transform(), ha="right", va="bottom", fontsize=7, color="0.3")
+    ax.text(-0.015, len(rows) - 0.4, "problem (qNEHVI later-acquisition yield)", transform=ax.get_yaxis_transform(), ha="right", va="bottom", fontsize=7, color="0.3")
     ax.text(15.6, len(rows) - 0.4, "measured", ha="left", va="bottom", fontsize=7, color="0.3")
     ax.grid(axis="x", color="0.9", lw=0.5, zorder=0); ax.tick_params(axis="y", length=0)
     handles = [Patch(color=C_REALLOC, label="reallocated evaluations (augmentation batch)"),
